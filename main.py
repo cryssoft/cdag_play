@@ -10,13 +10,16 @@
 #
 #  AUTHOR:  Christopher Petersen
 #
+#  NOTES:   It doesn't do a ton of error-checking on the inputs.  It doesn't check to make sure the
+#           graph is either connected (a deal breaker if not) or acyclic (a big deal breaker).
+#
 from csv import DictReader
 from sortedcontainers import SortedDict     #  The only dependency outside the standard libraries
 from sys import argv as g_argv, exit
 
 
 #  Not much more than a dataclass, but not a lot of boilerplate either
-#  Obviously:  FROM,TO,LENGTH
+#  Obviously:  FROM,TO,LENGTH - v1 in V, v2 in V, and l a positive real
 class Edge:
     def __init__(self, p_from: str, p_to: str, p_length: float) -> None:
         if ((p_from != '') and (p_to != '') and (p_length > 0)):
@@ -29,7 +32,7 @@ class Edge:
 
 
 #  Not a ton of functionality to this class
-#  Keeping the extra d_count_incoming saves us an extra len() one or two places
+#  Keeping up the extra d_count_incoming saves us an extra len() one or two places
 class Vertex:
     def __init__(self, p_name: str) -> None:
         self.d_name: str = p_name       #  Redundant but useful for debugging output
@@ -40,7 +43,8 @@ class Vertex:
 
     def add_incoming_edge(self, p_incoming: dict[str,str]) -> int:
         """
-        Create an Edge() on the fly, add it, and increment the count of in-coming edges
+        Create an Edge on the fly, append it, and increment the count of in-coming edges.
+        Any funny business in the headers or format of the CSV will probably raise exceptions here.
         """
         self.d_incoming.append(Edge(p_incoming['From'],p_incoming['To'],float(p_incoming['Length'])))
         self.d_count_incoming += 1
@@ -48,7 +52,8 @@ class Vertex:
     
     def set_source(self) -> None:
         """
-        The d_length_incoming defaults to -1, so reset it to zero for a node with no in-coming edges
+        The d_length_incoming defaults to -1, so reset it to zero for a node with no in-coming edges.
+        One small bit of data checking.
         """
         if self.d_count_incoming == 0:
             self.d_length_incoming = 0
@@ -93,7 +98,7 @@ def print_lengths(p_sd_vertices: SortedDict[str,Vertex]) -> None:
     """
     A little extra for debugging purposes
     """
-    for l_vertex in p_sd_vertices:
+    for l_vertex in sorted(p_sd_vertices):
         print(f'{l_vertex=} {p_sd_vertices[l_vertex].d_length_incoming}')
     return
 

@@ -14,3 +14,6 @@ have to be positive, real numbers.
 Changing the order of the input data without changing any of the contents can actually make the algorithm take
 more loops to fully resolve the output.  For instance, data-e.csv versus data-i.csv.  The Vertex and Edge values
 are the same, but changing the order of the input records changes it from 1 loop to 2.
+
+NOTE:  At least for some cases, it doesn't matter if the graph is acyclic because of the way the vertices
+and edges are evaluated.  Didn't think of that until after the first commits.

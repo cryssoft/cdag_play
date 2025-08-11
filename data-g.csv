@@ -1,0 +1,7 @@
+From,To,Length
+F,E,1.0
+E,D,1.0
+D,A,1.5
+D,C,0.1
+C,B,0.1
+B,A,0.5

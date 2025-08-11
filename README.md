@@ -17,3 +17,11 @@ are the same, but changing the order of the input records changes it from 1 loop
 
 NOTE:  At least for some cases, it doesn't matter if the graph is acyclic because of the way the vertices
 and edges are evaluated.  Didn't think of that until after the first commits.
+
+Also, wrote a little utility to put out my style of graph CSV file based on the directory tree of a Linux
+system.
+
+USAGE:  fs_to_graph.py > output-file
+
+It needs to be run as root to capture everything.  It tries to avoid parts of the file system tree that
+cause issues even when run as root.

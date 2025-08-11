@@ -16,6 +16,7 @@
 from csv import DictReader
 from sortedcontainers import SortedDict     #  The only dependency outside the standard libraries
 from sys import argv as g_argv, exit
+from time import perf_counter
 
 
 #  Not much more than a dataclass, but not a lot of boilerplate either
@@ -79,7 +80,7 @@ def load_from_file(p_fileName: str, p_sd_vertices: SortedDict[str,Vertex]) -> bo
             p_sd_vertices[l_dict['To']].add_incoming_edge(l_dict)
             l_return_value = True
 
-            print(f'Input data: {l_dict}')
+            # print(f'Input data: {l_dict}')
     return l_return_value
 
 
@@ -153,18 +154,25 @@ def main(p_argv: list[str]) -> None:
 
     if len(p_argv) == 2:
         if load_from_file(p_argv[1], l_sd_vertices):
-            print(f'Data loaded!')
-            print(f'{l_sd_vertices}')
-            set_single_source(l_sd_vertices)
-            load_sd_by_incoming_count(l_sd_incoming_edges, l_sd_vertices)
-            print(f'{l_sd_incoming_edges}')
-            while ((l_count_unsatisfied != 0) and (l_count_changes != 0)):
-                print(f'{l_count_loops}:')
-                print_lengths(l_sd_vertices)
-                l_count_unsatisfied, l_count_changes = resolve_loop(l_sd_incoming_edges, l_sd_vertices)
-                l_count_loops += 1
-            print(f'{l_count_loops}:')
-            print_lengths(l_sd_vertices)
+            # print(f'Data loaded!')
+            # print(f'{l_sd_vertices}')
+            # print(f'Zero in-coming Edge Vertices: {[x for x in l_sd_vertices if l_sd_vertices[x].d_count_incoming == 0]}')
+
+            if set_single_source(l_sd_vertices):
+                load_sd_by_incoming_count(l_sd_incoming_edges, l_sd_vertices)
+                # print(f'{l_sd_incoming_edges}')
+                l_time1 = perf_counter()
+                while ((l_count_unsatisfied != 0) and (l_count_changes != 0)):
+                    # print(f'{l_count_loops}:')
+                    # print_lengths(l_sd_vertices)
+                    l_count_unsatisfied, l_count_changes = resolve_loop(l_sd_incoming_edges, l_sd_vertices)
+                    l_count_loops += 1
+                l_time2 = perf_counter()
+                print(f'Elapsed time: {l_time2 - l_time1}')
+                # print(f'{l_count_loops}:')
+                # print_lengths(l_sd_vertices)
+            else:
+                print(f'No from Vertex with zero in-coming Edge found!')
         else:
             print(f'No data loaded!')
     else:

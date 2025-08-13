@@ -40,6 +40,7 @@ class Vertex:
         self.d_count_incoming: int = 0
         self.d_incoming: list[Edge] = []
         self.d_length_incoming: float = -1.0
+        self.d_shortest: str = ' '
         return
 
     def add_incoming_edge(self, p_incoming: dict[str,str]) -> int:
@@ -60,6 +61,22 @@ class Vertex:
             self.d_length_incoming = 0
         else:
             raise ValueError(f'Vertex: Only a vertex with no in-coming edges can be labeled as the single source')
+
+
+def gather_path(p_sd_vertices:SortedDict[str,Vertex], p_end: str) -> list[str]:
+    """
+    This is where we could get ourselves into trouble if we're not using an acyclic graph!  So far, it looks
+    like the single d_shortest value keeps us out of trouble.
+    """
+    l_return_value: list[str] = [p_end]
+
+    l_curr: str = p_end
+    while p_sd_vertices[l_curr].d_shortest != ' ':
+        l_return_value.append(p_sd_vertices[l_curr].d_shortest)
+        l_curr = p_sd_vertices[l_curr].d_shortest
+    l_return_value.reverse()
+
+    return l_return_value
 
 
 def load_from_file(p_fileName: str, p_sd_vertices: SortedDict[str,Vertex]) -> bool:
@@ -95,12 +112,12 @@ def load_sd_by_incoming_count(p_sd_incoming_edges: SortedDict[int,list[str]], p_
     return
 
 
-def print_lengths(p_sd_vertices: SortedDict[str,Vertex]) -> None:
+def print_results(p_sd_vertices: SortedDict[str,Vertex]) -> None:
     """
     A little extra for debugging purposes
     """
     for l_vertex in sorted(p_sd_vertices):
-        print(f'{l_vertex=} {p_sd_vertices[l_vertex].d_length_incoming}')
+        print(f'{l_vertex=} {p_sd_vertices[l_vertex].d_length_incoming} {gather_path(p_sd_vertices, l_vertex)}')
     return
 
 
@@ -120,6 +137,7 @@ def resolve_loop(p_sd_incoming_edges: SortedDict[int,list[str]], p_sd_vertices: 
                 else:
                     if ((p_sd_vertices[l_vertex].d_length_incoming == -1) or ((p_sd_vertices[l_incoming_edge.d_from].d_length_incoming + l_incoming_edge.d_length) < p_sd_vertices[l_vertex].d_length_incoming)):
                         p_sd_vertices[l_vertex].d_length_incoming = p_sd_vertices[l_incoming_edge.d_from].d_length_incoming + l_incoming_edge.d_length
+                        p_sd_vertices[l_vertex].d_shortest = l_incoming_edge.d_from
                         l_count_changes += 1
 
     return l_count_unsatisfied, l_count_changes
@@ -169,8 +187,8 @@ def main(p_argv: list[str]) -> None:
                     l_count_loops += 1
                 l_time2 = perf_counter()
                 print(f'Elapsed time: {l_time2 - l_time1}')
-                # print(f'{l_count_loops}:')
-                # print_lengths(l_sd_vertices)
+                print(f'{l_count_loops}:')
+                print_results(l_sd_vertices)
             else:
                 print(f'No from Vertex with zero in-coming Edge found!')
         else:

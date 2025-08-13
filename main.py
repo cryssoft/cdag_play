@@ -26,7 +26,7 @@ class Edge:
         if ((p_from != '') and (p_to != '') and (p_length > 0)):
             self.d_from: str = p_from
             self.d_to: str = p_to           #  Kind of redundant, since they'll be in a list w/in the destination vertex
-            self.d_length: str = p_length
+            self.d_length: float = p_length
         else:
             raise ValueError(f'Edge: constructor requires non-empty from/to node names and positive length')
         return
@@ -69,13 +69,11 @@ def gather_path(p_sd_vertices:SortedDict[str,Vertex], p_end: str) -> list[str]:
     like the single d_shortest value keeps us out of trouble.
     """
     l_return_value: list[str] = [p_end]
-
     l_curr: str = p_end
     while p_sd_vertices[l_curr].d_shortest != ' ':
         l_return_value.append(p_sd_vertices[l_curr].d_shortest)
         l_curr = p_sd_vertices[l_curr].d_shortest
     l_return_value.reverse()
-
     return l_return_value
 
 
@@ -96,7 +94,6 @@ def load_from_file(p_fileName: str, p_sd_vertices: SortedDict[str,Vertex]) -> bo
                 p_sd_vertices[l_dict['To']] = Vertex(l_dict['To'])
             p_sd_vertices[l_dict['To']].add_incoming_edge(l_dict)
             l_return_value = True
-
             # print(f'Input data: {l_dict}')
     return l_return_value
 
@@ -128,7 +125,6 @@ def resolve_loop(p_sd_incoming_edges: SortedDict[int,list[str]], p_sd_vertices: 
     """
     l_count_changes: int = 0
     l_count_unsatisfied: int = 0
-
     for l_count_incoming in p_sd_incoming_edges:
         for l_vertex in p_sd_incoming_edges[l_count_incoming]:
             for l_incoming_edge in p_sd_vertices[l_vertex].d_incoming:
@@ -139,7 +135,6 @@ def resolve_loop(p_sd_incoming_edges: SortedDict[int,list[str]], p_sd_vertices: 
                         p_sd_vertices[l_vertex].d_length_incoming = p_sd_vertices[l_incoming_edge.d_from].d_length_incoming + l_incoming_edge.d_length
                         p_sd_vertices[l_vertex].d_shortest = l_incoming_edge.d_from
                         l_count_changes += 1
-
     return l_count_unsatisfied, l_count_changes
 
 
@@ -169,13 +164,11 @@ def main(p_argv: list[str]) -> None:
     l_count_unsatisfied: int = -1
     l_sd_incoming_edges: SortedDict[int,list[str]] = {}
     l_sd_vertices: SortedDict[str,Vertex] = {}
-
     if len(p_argv) == 2:
         if load_from_file(p_argv[1], l_sd_vertices):
             # print(f'Data loaded!')
             # print(f'{l_sd_vertices}')
             # print(f'Zero in-coming Edge Vertices: {[x for x in l_sd_vertices if l_sd_vertices[x].d_count_incoming == 0]}')
-
             if set_single_source(l_sd_vertices):
                 load_sd_by_incoming_count(l_sd_incoming_edges, l_sd_vertices)
                 # print(f'{l_sd_incoming_edges}')
@@ -195,7 +188,6 @@ def main(p_argv: list[str]) -> None:
             print(f'No data loaded!')
     else:
         print(f'USAGE:  main.py input-file')
-
     return
 
 

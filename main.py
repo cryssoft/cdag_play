@@ -131,6 +131,11 @@ def resolve_loop(p_sd_incoming_edges: SortedDict[int,list[str]], p_sd_vertices: 
                 if p_sd_vertices[l_incoming_edge.d_from].d_length_incoming == -1:
                     l_count_unsatisfied += 1
                 else:
+                    #
+                    #  This is the only part that we'd have to change to go from "least cost" to "shortest path".  Shortest
+                    #  path should be equivalent to setting all "costs" (edge.d_length) to 1 (or any positive number as long
+                    #  as they're the same everywhere).
+                    #
                     if ((p_sd_vertices[l_vertex].d_length_incoming == -1) or ((p_sd_vertices[l_incoming_edge.d_from].d_length_incoming + l_incoming_edge.d_length) < p_sd_vertices[l_vertex].d_length_incoming)):
                         p_sd_vertices[l_vertex].d_length_incoming = p_sd_vertices[l_incoming_edge.d_from].d_length_incoming + l_incoming_edge.d_length
                         p_sd_vertices[l_vertex].d_shortest = l_incoming_edge.d_from
@@ -142,6 +147,10 @@ def set_single_source(p_sd_vertices: SortedDict[str,Vertex]) -> bool:
     """
     Find a Vertex with no in-coming edges and reset its d_length_incoming to zero.  One of the few error
     checks is this raises an exception if there are multiple Vertex with no in-coming edges.
+
+    This is one place where just doubling every edge to explicitly turn a directed graph into an undirected
+    graph won't work with this code.  The algorithm itself doesn't necessarily worry about that, so we could
+    choose a starting point instead of choosing the origin (zero in-coming).
     """
     l_return_value: bool = False
     for l_vertex in p_sd_vertices:

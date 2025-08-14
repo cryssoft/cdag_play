@@ -25,3 +25,9 @@ USAGE:  fs_to_graph.py > output-file
 
 It needs to be run as root to capture everything.  It tries to avoid parts of the file system tree that
 cause issues even when run as root.
+
+NOTE:  data-k-eq.csv has the same graph but sets all edges to a cost/weight/length of 1 to see how things
+work for a shortest-path case instead of a least-cost case.  It seems to work fine.
+
+NOTE:  This algorithm depends on having one vertex in the graph with no in-coming edges as the "origin" or
+starting vertex.  Doubling up every edge to turn a directed graph into an undirected graph won't work (yet).
